@@ -7,18 +7,22 @@
 # conditions defined in the file COPYING, which is part of this source code package.
 
 from cmk.notification_plugins.slack import slack_msg
-from cmk.notification_plugins.utils import (post_request, process_by_status_code)
+from cmk.notification_plugins.utils import (collect_context, post_request, process_by_status_code)
 
 def relay_msg(context):
     return { 'data': { 'event_key': 'event_value' } }
 
 if __name__ == "__main__":
+    context = collect_context()
+    context['NOTIFY_PARAMETER_IGNORE_SSL'] = True
     #response = post_request(slack_msg)
     api_token = context.get("PARAMETER_API_TOKEN")
+    print(f'api_token: {api_token}')
     response = post_request(
 	relay_msg, 
 	url='https://api.relay.sh/api/events',
-	headers=[{'Authorization': f'Bearer {api_token}' }]
+	headers={'Authorization': f'Bearer {api_token}' }
     )
+    print(f'response: {response}')
    
     process_by_status_code(response)

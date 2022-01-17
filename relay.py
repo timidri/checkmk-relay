@@ -55,7 +55,7 @@ class NotificationParameterRelay(NotificationParameter):
     def spec(self):
         return Dictionary(
             title=_("Create notification with the following parameters"),
-            optional_keys=["proxy_url"],
+            optional_keys=["ignore_ssl", "proxy_url"],
             elements=[
                 ("api_token",
                  TextAscii(
@@ -75,5 +75,12 @@ class NotificationParameterRelay(NotificationParameter):
                         # Transform legacy explicit TextAscii() proxy URL
                         forth=lambda v: ("url", v) if isinstance(v, str) else v,
                     )),
+                    ("ignore_ssl",
+                     FixedValue(
+                         True,
+                         title=_("Disable SSL certificate verification"),
+                         totext=_("Disable SSL certificate verification"),
+                         help=_("Ignore unverified HTTPS request warnings. Use with caution."),
+                     )),
 		],
 		)
