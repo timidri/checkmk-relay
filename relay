@@ -10,19 +10,31 @@ from cmk.notification_plugins.slack import slack_msg
 from cmk.notification_plugins.utils import (collect_context, post_request, process_by_status_code)
 
 def relay_msg(context):
-    return { 'data': { 'event_key': 'event_value' } }
+
+    return { 
+	'data': { 
+        	'hostname'		: context['HOSTNAME'],
+        	'host_address_4'	: context['HOST_ADDRESS_4'],
+        	'service_desc'		: context['SERVICEDESC'],
+        	'service_check_command'	: context['SERVICECHECKCOMMAND'],
+        	'service_output'	: context['SERVICEOUTPUT'],
+        	'service_perf_data'	: context['SERVICEPERFDATA'],
+        	'date'			: context['DATE'],
+         }
+    }
 
 if __name__ == "__main__":
     context = collect_context()
-    context['NOTIFY_PARAMETER_IGNORE_SSL'] = True
-    #response = post_request(slack_msg)
     api_token = context.get("PARAMETER_API_TOKEN")
-    print(f'api_token: {api_token}')
     response = post_request(
 	relay_msg, 
 	url='https://api.relay.sh/api/events',
 	headers={'Authorization': f'Bearer {api_token}' }
     )
-    print(f'response: {response}')
    
-    process_by_status_code(response)
+    process_by_status_code(response, success_code = 202)
+
+
+
+# vim: tabstop=4 shiftwidth=4 expandtab smarttab
+
